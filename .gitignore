@@ -1,0 +1,6 @@
+# user settings (personal hotkeys / options) - created on first run
+KeyFlip.ini
+
+# build artifacts
+*.exe
+.staging/
