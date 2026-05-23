@@ -66,7 +66,7 @@ Convert(mode) {
     Send "^c"
     if !ClipWait(0.4) {
       A_Clipboard := saved
-      SoundBeep 500, 120
+      ToggleLayout()        ; empty line / nothing to convert -> just flip the language
       return
     }
   }
@@ -74,6 +74,7 @@ Convert(mode) {
   text := A_Clipboard
   if (text = "") {
     A_Clipboard := saved
+    ToggleLayout()          ; nothing came through -> flip the language
     return
   }
 
@@ -107,6 +108,17 @@ IsMostlyHebrew(text) {
 SetLayout(klid) {
   hkl := DllCall("LoadKeyboardLayout", "Str", klid, "UInt", 1, "Ptr")
   PostMessage 0x0050, 0, hkl, , "ahk_id " WinExist("A")   ; WM_INPUTLANGCHANGEREQUEST
+}
+
+ToggleLayout() {
+  global englishKLID, hebrewKLID
+  toEnglish := false
+  if (hwnd := WinExist("A")) {
+    tid := DllCall("GetWindowThreadProcessId", "Ptr", hwnd, "Ptr", 0, "UInt")
+    hkl := DllCall("GetKeyboardLayout", "UInt", tid, "Ptr")
+    toEnglish := (((hkl & 0xFFFF) & 0x3FF) = 0x0D)   ; currently Hebrew -> switch to English
+  }
+  SetLayout(toEnglish ? englishKLID : hebrewKLID)
 }
 
 UpdateLangIcon() {
