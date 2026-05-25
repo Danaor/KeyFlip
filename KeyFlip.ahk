@@ -106,8 +106,11 @@ IsMostlyHebrew(text) {
 }
 
 SetLayout(klid) {
+  hwnd := WinExist("A")
+  if !hwnd                                  ; no active window -> nothing to switch
+    return
   hkl := DllCall("LoadKeyboardLayout", "Str", klid, "UInt", 1, "Ptr")
-  PostMessage 0x0050, 0, hkl, , "ahk_id " WinExist("A")   ; WM_INPUTLANGCHANGEREQUEST
+  try PostMessage(0x0050, 0, hkl, , "ahk_id " hwnd)   ; WM_INPUTLANGCHANGEREQUEST
 }
 
 ToggleLayout() {
